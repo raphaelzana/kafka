@@ -1,9 +1,11 @@
 package com.example.kafka.demo;
 import java.util.function.Consumer;
-import org.apache.kafka.streams.kstream.KStream;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Controller;
 
 @SpringBootApplication
@@ -15,11 +17,16 @@ public class DemoApplication {
 	}
 
 	@Bean
-	public Consumer<KStream<Object, String>> process(){
-		return input -> {
-			input.peek(((key, value) -> System.out.println(" value: "+value.toString())));
-			
-		};
-	}
+ 	public Consumer<Message<Person>> process() {
+    return message -> {
+        Acknowledgment acknowledgment = message.getHeaders().get(KafkaHeaders.ACKNOWLEDGMENT, Acknowledgment.class);
+		System.out.println(message.getPayload());
+		System.out.println(acknowledgment);
+        if (acknowledgment != null) {
+         System.out.println("Acknowledgment provided");
+         acknowledgment.acknowledge();
+        }
+    };
+}
 
 }
