@@ -8,6 +8,8 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Controller;
 
+import ch.qos.logback.core.util.Duration;
+
 @SpringBootApplication
 @Controller
 public class DemoApplication {
@@ -21,10 +23,16 @@ public class DemoApplication {
     return message -> {
         Acknowledgment acknowledgment = message.getHeaders().get(KafkaHeaders.ACKNOWLEDGMENT, Acknowledgment.class);
 		System.out.println(message.getPayload());
+        int partition = (int) message.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION);
+        System.out.println(message + " received from partition " + partition);
 		System.out.println(acknowledgment);
         if (acknowledgment != null) {
-         System.out.println("Acknowledgment provided");
-         acknowledgment.acknowledge();
+            try{
+                System.out.println("Acknowledgment provided");
+                acknowledgment.acknowledge();
+            } catch(Exception e){
+                acknowledgment.nack(java.time.Duration.ofSeconds(5));
+            }
         }
     };
 }
