@@ -22,13 +22,18 @@ public class DemoApplication {
         Acknowledgment acknowledgment = message.getHeaders().get(KafkaHeaders.ACKNOWLEDGMENT, Acknowledgment.class);
         System.out.println(message + " received from partition " + message.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION));
         if (acknowledgment != null) {
-            try{
+            
                 System.out.println("Acknowledgment provided");
-                acknowledgment.acknowledge();
-            } catch(Exception e){
+                //acknowledgment.acknowledge();
+                //throw new Exception();
+            
                 System.out.print("Acknowledgment not provided");
-                acknowledgment.nack(java.time.Duration.ofSeconds(5));
-            }
+                System.out.println(message.getHeaders().get("deliveryAttempt"));
+                //System.out.println(message.getHeaders().get("deliv").toString());
+                //acknowledgment.nack(java.time.Duration.ofSeconds(5));
+                //message.getHeaders().replace("deliveryAttempt", message.getHeaders().get("deliveryAttempt"), Integer.valueOf(message.getHeaders().get("deliveryAttempt").toString())+1);
+                
+            
         }
     };
 }
